@@ -1,71 +1,102 @@
-import requests
-from bs4 import BeautifulSoup
+from Helpers import *
 from dotenv import load_dotenv
-from openai import OpenAI
-import os
+
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Initialize OpenAI client
 openai_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_key)
 
-# Function to generate embeddings
-def get_openai_embedding(text):
-    response = client.embeddings.create(input=text, model="text-embedding-3-small")
-    embedding = response.data[0].embedding
-    print("==== Generating embeddings... ====")
-    return embedding
+## Query
+query_text = input("Enter your query: ")
+# query_text = "tell me something related to crypto"
+query_vector = get_openai_embedding(query_text, openai_key)
 
-# Function to scrape content from a URL
-def scrape_website(url):
-    # Send GET request to the URL
-    response = requests.get(url)
-    response.raise_for_status()  # Raise exception for HTTP errors
+## Get article as pandas df
+df = get_article(topic = "TECHNOLOGY")
 
-    # Parse the HTML content with BeautifulSoup
-    soup = BeautifulSoup(response.text, 'html.parser')
+## Initialize the ChromaDB client with persistence
+chroma_client = chromadb.PersistentClient(path="chroma_persistent_storage")
+collection_name = "title_article_collection"
+## delete old collection
+delete_collection(chroma_client, collection_name)
+## create new collection
+collection = chroma_client.get_or_create_collection(name=collection_name)
 
-    # Get all the text from paragraphs (<p>) and headings (<h1>, <h2>, etc.)
-    paragraphs = soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+## Input embedding, title and link to Chroma db
+for index, row in df.iterrows():
+    title = row['title']
+    link = row['link']
+    doc_id = row['id'] 
 
-    # Combine the text from all these tags
-    text = " ".join([para.get_text() for para in paragraphs])
+    ## Check if the document already exists in the collection
+    existing_result = collection.get(where={'doc_id': {"$in": [doc_id]}})
 
-    return text
+    ## If the document doesn't exist, add it to the collection
+    if len(existing_result.get('ids', [])) == 0:
+        # print(f"\nProcessing document with id {doc_id} (DataFrame index {index})")
+        title_vector = get_openai_embedding(title, openai_key)  ## Generate embedding for the title
 
-# Function to split the text into chunks with overlap
-def split_text(text, chunk_size=1000, chunk_overlap=20):
-    chunks = []
-    start = 0
-    while start < len(text):
-        end = start + chunk_size
-        chunks.append(text[start:end])
-        start = end - chunk_overlap  # Overlap the previous chunk
-    return chunks
+        collection.upsert(
+            ids=[str(doc_id)],
+            documents=[title],             ## The document is the title
+            metadatas=[{"link": link}],     ## Store the link as metadata
+            embeddings=[title_vector]       ## The generated embedding
+        )
+        # print(f"Document with id {doc_id} successfully upserted.")
 
-# Main function to process the link and generate embeddings
-def process_link(url):
-    # Step 1: Scrape the website content
-    print(f"Scraping content from {url}...")
-    website_text = scrape_website(url)
+print("\nTitle and Link successfully added to Chroma DB.")
 
-    # Step 2: Split the content into smaller pieces with overlap
-    print("Splitting content into chunks...")
-    chunks = split_text(website_text)
+## Retrieve the most relevant result (top 1)
+results = collection.query(
+    query_embeddings=[query_vector],
+    n_results=1
+)
 
-    # Step 3: Send each chunk to the OpenAI API for embedding
-    embeddings = []
-    for chunk in chunks:
-        embedding = get_openai_embedding(chunk)
-        embeddings.append(embedding)
+## Extract and print the link
+if results["ids"]:
+    best_match = results["metadatas"][0][0]  # First result, first metadata dict
+    print("Best matching link:", best_match["link"])
+else:
+    print("No relevant link found.")
 
-    print(f"Processed {len(chunks)} chunks from the website.")
-    return embeddings
+### retrieve link from chroma db
+url = best_match["link"]
+article_text = scrape_website(url)
+chunks = split_text(article_text)
 
-# Example usage:
-url = "https://crypto.news/study-the-current-bitcoin-adoption-level-is-like-the-internet-in-1990/"
-embeddings = process_link(url)
+## Initialize ChromaDB client
+chroma_client = chromadb.PersistentClient(path="chroma_persistent_storage")
+collection_name = "article_info_collection"
+## delete old collection
+delete_collection(chroma_client, collection_name)
+## create new collection
+collection = chroma_client.get_or_create_collection(name=collection_name)
 
+## Process and insert each chunk into ChromaDB
+for chunk in chunks:
+    chunk_id = generate_id(chunk)  # Generate a unique ID for each chunk
+    chunk_embedding = get_openai_embedding(chunk, openai_key)  # Generate embedding
+
+    collection.upsert(
+        ids=[chunk_id],  
+        documents=[chunk],  # Store the chunk of text
+        embeddings=[chunk_embedding]  
+    )
+
+print("\nArticle successfully added to Chroma DB.")
+
+### final answer!!
+results = collection.query(
+    query_embeddings=[query_vector],
+    n_results=5  
+)
+
+passage = "\n".join(results["documents"][0])
+# print(passage)
+
+query_text = "tell me something related to crypto"
+answer =  generate_response(query_text, passage, openai_key)
+print(answer)
 
