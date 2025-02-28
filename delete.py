@@ -15,3 +15,4 @@ try:
     print(f"Collection '{collection_name}' deleted successfully.")
 except Exception as e:
     print(f"Error deleting collection: {e}")
+    print('test')
