@@ -35,15 +35,25 @@ The **ChromaQuery** system follows a modular design that integrates several key 
 ### **6️⃣ Final Response Generation**
 - **Answer Synthesis**: The system then queries the **ChromaDB collection** to retrieve the most relevant chunks and generates a **contextual response** using the OpenAI model.
 
-### **Diagram of the Architecture**
+## **Diagram of the Architecture**
 ### **Get Article & Link**
 ```mermaid
 graph LR
     A[User Input] --> B[Generate Query Embedding]
     B --> C[ChromaDB - Store Embeddings and Metadata]
 ```
-### **Get Article & Link**
-
+### **Get Article Content**
+```mermaid
+graph LR
+    C --> D[Web Scraping of Articles]
+    D --> E[Store Article Chunks in ChromaDB]
+```
+### **Retrieve Chunks & Generate Response**
+```mermaid
+graph LR
+    E --> F[Retrieve Relevant Chunks]
+    F --> G[Generate AI-Generated Response]
+```
 
 
 
