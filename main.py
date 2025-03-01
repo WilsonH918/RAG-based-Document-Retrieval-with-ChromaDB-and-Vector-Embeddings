@@ -98,5 +98,5 @@ passage = "\n".join(results["documents"][0])
 
 query_text = "tell me something related to crypto"
 answer =  generate_response(query_text, passage, openai_key)
-print(answer)
+print(answer.content)
 

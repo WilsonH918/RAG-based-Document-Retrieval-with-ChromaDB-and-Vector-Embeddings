@@ -44,13 +44,12 @@ def get_article(topic = "TECHNOLOGY"):
 
     return df
 
-
 # Function to generate embeddings
 def get_openai_embedding(text, openai_key):
     client = OpenAI(api_key=openai_key)
     response = client.embeddings.create(input=text, model="text-embedding-3-small")
     embedding = response.data[0].embedding
-    print("==== Generating embeddings... ====")
+    print("====Generating embeddings====")
     return embedding
 
 # delete chroma db collection
