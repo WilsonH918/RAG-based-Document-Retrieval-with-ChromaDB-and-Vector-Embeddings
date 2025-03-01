@@ -51,20 +51,25 @@ print("\nTitle and Link successfully added to Chroma DB.")
 ## Retrieve the most relevant result (top 1)
 results = collection.query(
     query_embeddings=[query_vector],
-    n_results=1
+    n_results=5
 )
 
-## Extract and print the link
+## Extract and print all links
 if results["ids"]:
-    best_match = results["metadatas"][0][0]  # First result, first metadata dict
-    print("Best matching link:", best_match["link"])
+    best_match = [meta for sublist in results["metadatas"] for meta in sublist]  # Flatten list of lists
+    all_links = [match["link"] for match in best_match]  # Extract all links
+    print("Relevant links:", all_links)
 else:
     print("No relevant link found.")
 
 ### retrieve link from chroma db
-url = best_match["link"]
-article_text = scrape_website(url)
-chunks = split_text(article_text)
+all_chunks = [] 
+for url in all_links:
+    print(f"web scrapping url: {url}")
+    article_text = scrape_website(url)
+    if article_text:
+        chunks = split_text(article_text)  # chunks is already a list
+        all_chunks.extend(chunks)
 
 ## Initialize ChromaDB client
 chroma_client = chromadb.PersistentClient(path="chroma_persistent_storage")
@@ -75,7 +80,7 @@ delete_collection(chroma_client, collection_name)
 collection = chroma_client.get_or_create_collection(name=collection_name)
 
 ## Process and insert each chunk into ChromaDB
-for chunk in chunks:
+for chunk in all_chunks:
     chunk_id = generate_id(chunk)  # Generate a unique ID for each chunk
     chunk_embedding = get_openai_embedding(chunk, openai_key)  # Generate embedding
 
@@ -96,7 +101,6 @@ results = collection.query(
 passage = "\n".join(results["documents"][0])
 # print(passage)
 
-query_text = "tell me something related to crypto"
 answer =  generate_response(query_text, passage, openai_key)
 print(answer.content)
 

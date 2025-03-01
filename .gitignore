@@ -7,3 +7,5 @@ venv/
 .idea/
 # ignore the .env file
 .env
+# ignore __pycache__
+__pycache__/

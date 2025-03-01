@@ -65,21 +65,47 @@ def delete_collection(chroma_client, collection_name):
         print(f"Error deleting collection: {e}")
 
 # Function to scrape content from a URL
+# def scrape_website(url):
+#     # Send GET request to the URL
+#     response = requests.get(url)
+#     response.raise_for_status()  # Raise exception for HTTP errors
+
+#     # Parse the HTML content with BeautifulSoup
+#     soup = BeautifulSoup(response.text, 'html.parser')
+
+#     # Get all the text from paragraphs (<p>) and headings (<h1>, <h2>, etc.)
+#     paragraphs = soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+
+#     # Combine the text from all these tags
+#     text = " ".join([para.get_text() for para in paragraphs])
+
+#     return text
+
+
+### new
 def scrape_website(url):
-    # Send GET request to the URL
-    response = requests.get(url)
-    response.raise_for_status()  # Raise exception for HTTP errors
+    try:
+        # Send GET request to the URL
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()  # Raise exception for HTTP errors
 
-    # Parse the HTML content with BeautifulSoup
-    soup = BeautifulSoup(response.text, 'html.parser')
+        # Parse the HTML content with BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Get all the text from paragraphs (<p>) and headings (<h1>, <h2>, etc.)
-    paragraphs = soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+        # Get all the text from paragraphs (<p>) and headings (<h1>, <h2>, etc.)
+        paragraphs = soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
 
-    # Combine the text from all these tags
-    text = " ".join([para.get_text() for para in paragraphs])
+        # Combine the text from all these tags
+        text = " ".join([para.get_text() for para in paragraphs])
 
-    return text
+        return text
+    
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTPError for {url}: {e}, move on to next link...")
+    except requests.exceptions.RequestException as e:
+        print(f"RequestException for {url}: {e}, move on to next link...")
+    
+    return None
 
 # Function to split the text into chunks with overlap
 def split_text(text, chunk_size=1000, chunk_overlap=20):
