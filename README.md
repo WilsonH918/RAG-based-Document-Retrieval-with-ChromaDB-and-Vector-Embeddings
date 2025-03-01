@@ -9,15 +9,41 @@ The project consists of three parts:
 - ChromaDB: Stores and indexes documents and their embeddings for efficient retrieval using semantic search.
 
 ## Project Architecture
-[ User Input ]
-      ↓
-[ Generate Query Embedding ] → [ ChromaDB - Store Embeddings and Metadata ]
-      ↓
-[ Web Scraping of Articles ]
-      ↓
-[ Store Article Chunks in ChromaDB ]
-      ↓
-[ Retrieve Relevant Chunks ]
-      ↓
-[ Generate AI-Generated Response ]
+
+The **ChromaQuery** system follows a modular design that integrates several key components for efficient knowledge retrieval and response generation. Below is an overview of the main architecture:
+
+### **1️⃣ User Input & Query Processing**
+- **User Input**: The system starts by accepting a query from the user (e.g., `"Tell me something related to crypto"`).
+- **Query Embedding**: The input query is converted into an **embedding** using OpenAI's model, which transforms the text into a numerical vector.
+
+### **2️⃣ Document Retrieval with ChromaDB**
+- **Article Fetching**: The system fetches technology-related articles from a predefined source using **web scraping** (via **BeautifulSoup** and **requests**).
+- **Metadata & Embedding Storage**: For each article, the system stores the **title, link, and embedding** (semantic vector) in **ChromaDB**, along with metadata for easy retrieval.
+- **Persistence**: ChromaDB provides persistent storage to keep document embeddings and metadata across sessions.
+
+### **3️⃣ Relevant Document Search**
+- **Query Matching**: Once the user query is embedded, it is matched against the embeddings stored in ChromaDB using **vector-based search** to find the most relevant documents.
+- **Top Results**: The system retrieves the top documents based on **semantic similarity** to the query embedding.
+
+### **4️⃣ Web Scraping for Article Content**
+- **Full Text Retrieval**: After retrieving relevant article links, the system scrapes the content of these articles (handling multiple sources) to extract detailed information.
+- **Text Chunking**: The article content is split into smaller **chunks** for more granular search and indexing.
+
+### **5️⃣ Storing Chunks in ChromaDB**
+- **Chunk Storage**: The system stores these article chunks (along with their embeddings) in a new **ChromaDB collection**, ensuring fast access and retrieval.
+  
+### **6️⃣ Final Response Generation**
+- **Answer Synthesis**: The system then queries the **ChromaDB collection** to retrieve the most relevant chunks and generates a **contextual response** using the OpenAI model.
+
+### **Diagram of the Architecture**
+
+```mermaid
+graph LR
+    A[User Input] --> B[Generate Query Embedding]
+    B --> C[ChromaDB - Store Embeddings and Metadata]
+    C --> D[Web Scraping of Articles]
+    D --> E[Store Article Chunks in ChromaDB]
+    E --> F[Retrieve Relevant Chunks]
+    F --> G[Generate AI-Generated Response]
+
 
