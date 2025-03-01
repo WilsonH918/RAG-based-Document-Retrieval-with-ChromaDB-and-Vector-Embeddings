@@ -45,13 +45,13 @@ graph LR
 ### **Get Article Content**
 ```mermaid
 graph LR
-    C --> D[Web Scraping of Articles]
+    C[ChromaDB - Store Embeddings and Metadata] --> D[Web Scraping of Articles]
     D --> E[Store Article Chunks in ChromaDB]
 ```
 ### **Retrieve Chunks & Generate Response**
 ```mermaid
 graph LR
-    E --> F[Retrieve Relevant Chunks]
+    E[Store Article Chunks in ChromaDB] --> F[Retrieve Relevant Chunks]
     F --> G[Generate AI-Generated Response]
 ```
 
