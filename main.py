@@ -7,6 +7,7 @@ load_dotenv()
 
 # Initialize OpenAI client
 openai_key = os.getenv("OPENAI_API_KEY")
+rapidapi_key = os.getenv("RAPID_API_KEY")
 
 ## Query
 query_text = input("Enter your query: ")
@@ -14,7 +15,7 @@ query_text = input("Enter your query: ")
 query_vector = get_openai_embedding(query_text, openai_key)
 
 ## Get article as pandas df
-df = get_article(topic = "TECHNOLOGY")
+df = get_article(rapidapi_key, topic = "TECHNOLOGY")
 
 ## Initialize the ChromaDB client with persistence
 chroma_client = chromadb.PersistentClient(path="chroma_persistent_storage")

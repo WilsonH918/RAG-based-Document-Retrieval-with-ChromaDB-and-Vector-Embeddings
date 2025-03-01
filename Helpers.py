@@ -14,18 +14,20 @@ load_dotenv()
 
 # Initialize OpenAI client
 openai_key = os.getenv("OPENAI_API_KEY")
+rapidapi_key = os.getenv("RAPID_API_KEY")
+
 
 # Generate a consistent hash (ID) based on the link
 def generate_id(link):
     return str(hashlib.sha256(link.encode('utf-8')).hexdigest())
 
-def get_article(topic = "TECHNOLOGY"):
+def get_article(rapidapi_key, topic = "TECHNOLOGY"):
     # Your code to fetch the articles and return the DataFrame
     url = "https://real-time-news-data.p.rapidapi.com/topic-news-by-section"
     querystring = {"topic":topic,"section":"CAQiSkNCQVNNUW9JTDIwdk1EZGpNWFlTQldWdUxVZENHZ0pKVENJT0NBUWFDZ29JTDIwdk1ETnliSFFxQ2hJSUwyMHZNRE55YkhRb0FBKi4IACoqCAoiJENCQVNGUW9JTDIwdk1EZGpNWFlTQldWdUxVZENHZ0pKVENnQVABUAE","limit":"500","country":"GB","lang":"en"}
 
     headers = {
-        "x-rapidapi-key": "68968cc231msha447505cfb19142p1ebbe2jsnb72182824786",
+        "x-rapidapi-key": rapidapi_key,
         "x-rapidapi-host": "real-time-news-data.p.rapidapi.com"
     }
 
