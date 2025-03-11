@@ -1,6 +1,4 @@
 # ChromaQuery: AI-Powered Knowledge Retrieval
-
-## Overview
 ChromaQuery is an AI-powered knowledge retrieval system that integrates retrieval-augmented generation (RAG), web scraping, and ChromaDB for accurate and real-time responses. The system uses OpenAI embeddings and vector search to retrieve relevant articles and generate contextual answers.
 
 The project consists of three parts:  
@@ -8,7 +6,7 @@ The project consists of three parts:
 - Web Scraping: Extracts and updates content from online sources using BeautifulSoup and requests.
 - ChromaDB: Stores and indexes documents and their embeddings for efficient retrieval using semantic search.
 # RAG Pipeline Architecture
-<img width="800" alt="OVERVIEW" src="https://github.com/user-attachments/assets/81a99c9b-01ca-4c86-b87a-27588f6cbb11" />
+<img width="1800" alt="OVERVIEW" src="https://github.com/user-attachments/assets/81a99c9b-01ca-4c86-b87a-27588f6cbb11" />
 
 
 ## Project Architecture
