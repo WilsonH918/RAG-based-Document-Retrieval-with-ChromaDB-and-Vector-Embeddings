@@ -7,6 +7,9 @@ The project consists of three parts:
 - RAG (Retrieval-Augmented Generation): Combines document retrieval and language generation to enhance response accuracy using OpenAI embeddings and vector-based search.
 - Web Scraping: Extracts and updates content from online sources using BeautifulSoup and requests.
 - ChromaDB: Stores and indexes documents and their embeddings for efficient retrieval using semantic search.
+# Architect Overview
+<img width="648" alt="OVERVIEW" src="https://github.com/user-attachments/assets/81a99c9b-01ca-4c86-b87a-27588f6cbb11" />
+
 
 ## Project Architecture
 
