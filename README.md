@@ -6,7 +6,8 @@ The project consists of three parts:
 - Web Scraping: Extracts and updates content from online sources using BeautifulSoup and requests.
 - ChromaDB: Stores and indexes documents and their embeddings for efficient retrieval using semantic search.
 # RAG Pipeline Architecture
-<img width="1800" alt="OVERVIEW" src="https://github.com/user-attachments/assets/21448040-ef21-4b27-a02d-381ba0d35aaa" />
+<img width="1800" alt="RAG OVERVIEW" src="https://github.com/user-attachments/assets/7bf8f9df-bdca-463e-aae3-5f9102394c04" />
+
 
 ## Project Architecture
 
